@@ -1,0 +1,12 @@
+#!/bin/bash -eux
+id="$1"
+archives_root="/media/pi/Elements/tots-ps/data"
+ssh_target="pi@planktoscope-regular-level-9927.local"
+ssh "$ssh_target" "mkdir -p /home/pi/data/import"
+ssh "$ssh_target" "cd /home/pi/data; tar -czf \"/home/pi/data/results/$id-results.tar.gz\" objects/ export/"
+ssh "$ssh_target" "cd /home/pi/data; ls -l objects/*/*/*/*.jpg | wc -l > /home/pi/data/results/$id-results-count.txt"
+scp "$ssh_target:/home/pi/data/results/$id-results.tar.gz" "$archives_root/"
+scp "$ssh_target:/home/pi/data/results/$id-results-count.txt" "$archives_root/"
+ssh "$ssh_target" "rm -rf /home/pi/data/clean/* && rm -rf /home/pi/data/objects/* && rm -rf /home/pi/data/img/* && rm -rf /home/pi/data/export/ecotaxa/*"
+ssh "$ssh_target" "rm /home/pi/data/results/$id-results.tar.gz && rm /home/pi/data/results/$id-results-count.txt"
+echo "Connect to the internet, then run \`tots-share-results.sh $id\`"
